@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1731617375578",
+    "name": "room1",
+    "tables": [
+      {
+        "src": "/static/media/Mid.ba26aff8de68b44f3a71a0f146a3764f.svg",
+        "x": 110,
+        "y": 121.125,
+        "name": "table 1",
+        "min": 2,
+        "max": 4,
+        "online": false,
+        "rotation": 90
+      }
+    ]
+  },
+  {
+    "id": "1731618213803",
+    "name": "room2",
+    "tables": []
+  }
+]

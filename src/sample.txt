@@ -1,0 +1,528 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  Drawer,
+  Box,
+  Typography,
+  IconButton,
+  TextField,
+  Button,
+  Snackbar,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Switch,
+  DialogActions,
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import axios from 'axios';
+import image from '../images.png';
+import image2 from '../image2.svg';
+
+interface Table {
+  id: string;
+  src: string;
+  x: number;
+  y: number;
+  name: string;
+  min: number;
+  max: number;
+  online: boolean;
+  rotation: number; // Rotation angle in degrees
+}
+
+interface Room {
+  id: string;
+  name: string;
+  tables: Table[];
+}
+
+const RoomPage: React.FC = () => {
+  const { roomName } = useParams<{ roomName: string }>();
+  const navigate = useNavigate();
+
+  // Default room id and name
+  const defaultRoomId = '';
+  const defaultRoomName = roomName || 'Room 1';
+
+  const [room, setRoom] = useState<Room>({
+    id: defaultRoomId,
+    name: defaultRoomName,
+    tables: [],
+  });
+  const [editingImage, setEditingImage] = useState<Table | null>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false); // Snackbar state
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [click,setClick] = useState(false);
+  const [newImage, setNewImage] = useState<Partial<Table>>({});
+
+  const backendUrl = 'http://localhost:4000';
+
+  useEffect(() => {
+    console.log(roomName);
+    axios
+      .get(`${backendUrl}/api/layout/${roomName}`) // Use roomName dynamically
+      .then((response) => {
+        console.log(response);
+  
+        // Update the entire room state from the response
+        setRoom({
+          id: response.data.id || defaultRoomId, // Fallback to defaultRoomId if not present
+          name: response.data.name || defaultRoomName, // Fallback to defaultRoomName if not present
+          tables: response.data.tables || [], // Fallback to empty array if tables are not present
+        });
+      })
+      .catch((error) => {
+        console.error('Error fetching layout data:', error);
+      });
+  }, [click]); // Dependency on roomName
+   // Change to depend on roomName instead of roomId
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const imageUrl = e.dataTransfer.getData('imageUrl');
+  
+    if (imageUrl) {
+      const dropAreaRect = e.currentTarget.getBoundingClientRect();
+      const dropX = e.clientX - dropAreaRect.left;
+      const dropY = e.clientY - dropAreaRect.top;
+  
+      const isOverlapping = room?.tables?.some((image) => {
+        const imageWidth = 50;
+        const imageHeight = 50;
+        return (
+          dropX >= image.x - imageWidth / 2 &&
+          dropX <= image.x + imageWidth / 2 &&
+          dropY >= image.y - imageHeight / 2 &&
+          dropY <= image.y + imageHeight / 2
+        );
+      }) || false; // Default to false if room.tables is undefined
+      
+  
+      if (isOverlapping) {
+        setSnackbarMessage('Cannot drop an image on top of another image!');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+        return;
+      }
+  
+      setNewImage({ src: imageUrl, x: dropX, y: dropY });
+      setDialogOpen(true);
+    }
+  };
+
+  const handleDeleteRoom = (roomName: string) => {
+    // Ask for confirmation before proceeding with deletion
+    const isConfirmed = window.confirm(`Are you sure you want to delete the room "${roomName}"?`);
+  
+    if (isConfirmed) {
+      // Send the DELETE request to the server
+      axios.delete(`${backendUrl}/api/layout/${roomName}`)
+        .then((response) => {
+          console.log('Room deleted successfully:', response.data);
+  
+          setSnackbarMessage(`Room deleted successfully.`);
+          setSnackbarSeverity('success');
+          setSnackbarOpen(true); // Show Snackbar with success message
+          // Optionally, update the state or re-fetch the rooms list
+
+           navigate("/");
+        })
+        .catch((error) => {
+          console.error('Error deleting room:', error.response ? error.response.data : error.message);
+          setSnackbarMessage(`Error deleting room: ${error.response ? error.response.data : error.message}`);
+          setSnackbarSeverity('error');
+          setSnackbarOpen(true); // Show Snackbar with error message
+        });
+    } else {
+      // If the user canceled the deletion
+      console.log('Room deletion canceled.');
+    }
+  };
+  
+
+  const handleDialogSave = () => {
+    if (
+      newImage.name &&
+      newImage.min !== undefined &&
+      newImage.max !== undefined &&
+      newImage.min <= newImage.max // Check if min <= max
+    ) {
+      const image = {
+        ...newImage,
+        online: newImage.online || false,
+        rotation: newImage.rotation !== undefined ? newImage.rotation : 0,
+      } as Table;
+  
+      // Ensure tables array is defined and fallback to an empty array if not
+      const updatedRoom = {
+        ...room,
+        tables: [...(room?.tables || []).filter(table => table.name !== image.name), image],
+      };
+  
+      setRoom(updatedRoom);
+      setDialogOpen(false);
+
+      console.log(updatedRoom)
+  
+      axios
+        .post(`${backendUrl}/api/layout`, updatedRoom)
+        .then(() => {
+          setSnackbarMessage('Image added successfully!');
+          setSnackbarSeverity('success');
+          setSnackbarOpen(true);
+        })
+        .catch((error) => {
+          setSnackbarMessage('Error saving image!');
+          setSnackbarSeverity('error');
+          setSnackbarOpen(true);
+          console.error('Error saving layout:', error);
+        });
+    } else {
+      setSnackbarMessage('Please fill in all required fields (Name, Min <= Max).');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  };
+  
+  
+  
+  const handleEditSave = () => {
+    if (editingImage) {
+      if (
+        editingImage.name &&
+        editingImage.min !== undefined &&
+        editingImage.max !== undefined &&
+        editingImage.min <= editingImage.max // Check if min <= max
+      ) {
+        const updatedImages = room.tables.map((table) =>
+          table.name === editingImage.name ? editingImage : table
+        );
+        const updatedRoom = { ...room, tables: updatedImages };
+        console.log(updatedRoom)
+        setRoom(updatedRoom);
+        setEditingImage(null);
+  
+        axios
+          .post(`${backendUrl}/api/layout`, updatedRoom) // Use PUT here
+          .then(() => {
+            setSnackbarMessage('Image updated successfully!');
+            setSnackbarSeverity('success');
+            setSnackbarOpen(true);
+          })
+          .catch((error) => {
+            setSnackbarMessage('Error updating image!');
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
+            console.error('Error updating layout:', error);
+          });
+      } else {
+        setSnackbarMessage('Please fill in all required fields (Name, Min <= Max).');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+      }
+    }
+  };
+  
+  
+  
+  
+  
+
+  const handleImageClick = (name: string) => {
+    setClick(!click); // Toggle the state
+    console.log(name);
+    setEditingImage(room.tables.find((image) => image.name === name) || null);
+  };
+  
+  
+  
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleImageDragStart = (e: React.DragEvent, imageUrl: string) => {
+    e.dataTransfer.setData('imageUrl', imageUrl);
+  };
+
+    const handleDialogClose = () => {
+    setDialogOpen(false);
+    setNewImage({});
+  };
+
+  const handleDelete = (name: string) => {
+    const updatedImages = room.tables.filter((image) => image.name !== name);
+    const updatedRoom = { ...room, tables: updatedImages };
+    setRoom(updatedRoom);
+
+    axios
+      .post(`${backendUrl}/api/layout`, updatedRoom)
+      .then(() => console.log('Layout saved'))
+      .catch((error) => console.error('Error saving layout:', error));
+
+    // Clear editing image if it was deleted
+    if (editingImage?.name === name) {
+      setEditingImage(null);
+    }
+  };
+
+
+  const handleRotate = () => {
+    if (editingImage) {
+      const newRotation = (editingImage.rotation + 90) % 360;
+      setEditingImage({
+        ...editingImage,
+        rotation: newRotation,
+      });
+
+      setRoom((prevRoom) => ({
+        ...prevRoom,
+        tables: prevRoom.tables.map((image) =>
+          image.name === editingImage.name
+            ? { ...image, rotation: newRotation }
+            : image
+        ),
+      }));
+    }
+  };
+
+  
+  
+
+  return (
+    <div style={{ position: 'fixed', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+      {/* Second Drawer (dynamically rendered based on room name) */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: 400, // Width of the second drawer
+          flexShrink: 0,
+          position: 'absolute',
+          zIndex: 1000,
+          top: '64px', // Position the second drawer below the AppBar
+          '& .MuiDrawer-paper': {
+            width: 400,
+            boxSizing: 'border-box',
+          },
+        }}
+      >
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            marginLeft: '150px', // Adjust for the width of the second drawer
+            marginTop: '64px', // Account for AppBar height
+          }}
+        >
+          <Typography variant="h6">Drag the Image</Typography>
+          <img
+            src={image}
+            alt="draggable"
+            draggable
+            onDragStart={(e) => handleImageDragStart(e, image)}
+            style={{ width: '50px', height: '50px', cursor: 'pointer' }}
+          />
+          <img
+            src={image2}
+            alt="draggable"
+            draggable
+            onDragStart={(e) => handleImageDragStart(e, image2)}
+            style={{ width: '50px', height: '50px', cursor: 'pointer', marginTop: '10px' }}
+          />
+
+          {/* Moved this block to the bottom */}
+          {editingImage ? (
+            <>
+<Typography variant="h6">Edit Image</Typography>
+
+<TextField
+  label="Name"
+  value={editingImage.name}
+  onChange={(e) => setEditingImage({ ...editingImage, name: e.target.value })}
+  fullWidth
+  margin="normal"
+  disabled // Add this prop to disable the field
+/>
+
+
+<TextField
+  label="Min"
+  type="number"
+  value={editingImage.min}
+  onChange={(e) => setEditingImage({ ...editingImage, min: +e.target.value })}
+  fullWidth
+  margin="normal"
+/>
+
+<TextField
+  label="Max"
+  type="number"
+  value={editingImage.max}
+  onChange={(e) => setEditingImage({ ...editingImage, max: +e.target.value })}
+  fullWidth
+  margin="normal"
+/>
+
+<Box display="flex" alignItems="center" mt={2}>
+  <Typography>Online</Typography>
+  <Switch
+    checked={editingImage.online}
+    onChange={(e) =>
+      setEditingImage({ ...editingImage, online: e.target.checked })
+    }
+  />
+</Box>
+
+<Box mt={2}>
+        <Button variant="contained" color="primary" onClick={handleRotate}>
+          Rotate Image
+        </Button>
+      </Box>
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleEditSave}
+          sx={{ mt: 2 }}
+        >
+          Save
+        </Button>
+
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={() => handleDelete(editingImage.name)}
+          sx={{ mt: 2 }}
+          startIcon={<DeleteIcon />}
+        >
+          Delete
+        </Button>
+
+            </>
+          ) : null}
+        </Box>
+
+      </Drawer>
+
+      {/* Drag and Drop Area */}
+      <div style={{marginLeft: '300px'}}>
+       <h1 style={{ color: '#16a085'}}>{roomName}</h1>
+       <Button
+      variant="contained"
+      color="error"
+      onClick={() => handleDeleteRoom(defaultRoomName)}
+      startIcon={<DeleteIcon />}
+    >
+      Delete Table
+    </Button>
+      <div
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        style={{
+          position: 'fixed',
+          width: '60%',
+          height: '70%',
+          border: '2px dashed #ccc',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f9f9f9',
+        }}
+      >
+          <Typography
+          variant="h6"
+          gutterBottom
+          style={{ textAlign: 'center', color: '#999' }}
+        >
+          Drop Image Here
+        </Typography>
+        {room.tables.map((image) => (
+          <div
+            key={image.name}
+            style={{
+              position: 'absolute',
+              top: image.y - 25,
+              left: image.x - 25,
+              transform: `rotate(${image.rotation}deg)`, // Apply rotation from droppedImages state
+            }}
+          >
+            <img
+              src={image.src}
+              alt="Dropped"
+              style={{ width: '50px', height: '50px', cursor: 'pointer' }}
+              onClick={() => handleImageClick(image.name)} // Updated click handler to rotate
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+    <Dialog open={dialogOpen} onClose={handleDialogClose}>
+      <DialogTitle>Add Image Details</DialogTitle>
+      <DialogContent>
+        <TextField
+          label="Name"
+          value={newImage.name || ''}
+          onChange={(e) => setNewImage({ ...newImage, name: e.target.value })}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Min"
+          type="number"
+          value={newImage.min || ''}
+          onChange={(e) => setNewImage({ ...newImage, min: +e.target.value })}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Max"
+          type="number"
+          value={newImage.max || ''}
+          onChange={(e) => setNewImage({ ...newImage, max: +e.target.value })}
+          fullWidth
+          margin="normal"
+        />
+        <Box display="flex" alignItems="center" mt={2}>
+          <Typography>Online</Typography>
+          <Switch
+            checked={newImage.online || false}
+            onChange={(e) => setNewImage({ ...newImage, online: e.target.checked })}
+          />
+        </Box>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleDialogClose}>Cancel</Button>
+        <Button onClick={handleDialogSave}>Save</Button>
+      </DialogActions>
+    </Dialog>
+
+
+    <Snackbar
+  open={snackbarOpen}
+  autoHideDuration={3000}
+  onClose={() => setSnackbarOpen(false)}
+  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+  sx={{
+    zIndex: 1300, // Ensure the Snackbar appears above the AppBar
+    marginBottom: 0, // Adjust this based on your AppBar height
+  }}
+>
+  <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
+    {snackbarMessage}
+  </Alert>
+</Snackbar>
+
+
+
+
+    </div>
+  );
+};
+
+export default RoomPage;

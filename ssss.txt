@@ -1,0 +1,159 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Box, AppBar, Toolbar, Typography, Drawer, Button, List, ListItemButton, ListItemText, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+
+const drawerWidth = 150;
+
+const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [rooms, setRooms] = useState<{ id: string, name: string }[]>([]); // Update the state type to match room structure
+  const [roomName, setRoomName] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [error, setError] = useState<string>(""); // State for error message
+  const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  // Fetch rooms data from backend when the component mounts
+  useEffect(() => {
+    axios.get("http://localhost:4000/api/layout") // Adjust the URL if needed
+      .then(response => {
+        setRooms(response.data); // Set rooms state with fetched data
+      })
+      .catch(error => {
+        console.error("Error fetching rooms:", error);
+      });
+  }, []); // Empty dependency array means this runs once after the first render
+
+  const handleAddRoom = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setRoomName("");
+  };
+
+  const handleSaveRoom = () => {
+    if (roomName.trim()) {
+      axios.post("http://localhost:4000/api/room", { name: roomName.trim() })
+        .then(response => {
+          setRooms(prevRooms => [...prevRooms, response.data]); // Use the response data for the new room
+          setError(""); // Clear any previous error messages
+          handleCloseDialog();
+
+          navigate(`/room/${response.data.name}`);
+        })
+        .catch(error => {
+          if (error.response && error.response.status === 409) {
+            setError("Room name already exists."); // Set error message for duplicate name
+          } else {
+            console.error("Error saving room:", error);
+            setError("An error occurred while saving the room."); // Set generic error message
+          }
+        });
+    } else {
+      setError("Please enter a room name."); // Set error message for empty input
+    }
+  };
+  
+
+
+  // Layout.tsx
+const handleRoomClick = (roomName: string) => {
+  setSelectedRoom(roomName);
+  navigate(`/room/${roomName}`); // This should correctly pass the room name
+};
+
+
+  return (
+    <Box sx={{ display: "flex", position: "relative" }}>
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          position: "absolute",
+          zIndex: 1100,
+          "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            boxSizing: "border-box",
+          },
+        }}
+      >
+        <Toolbar />
+        <Box sx={{ overflow: "auto", padding: 2 }}>
+          <Button variant="contained" color="primary" onClick={handleAddRoom} sx={{ marginBottom: 2 }}>
+            Add Room
+          </Button>
+          <List>
+          {rooms.map((room) => (
+    <ListItemButton
+      key={room.name}
+      onClick={() => handleRoomClick(room.name)}
+      selected={selectedRoom === room.name} // Highlight the selected room
+      sx={{ 
+        backgroundColor: selectedRoom === room.name ? 'rgba(0, 0, 0, 0.08)' : 'inherit' // Optional styling for selected item
+      }}
+    >
+      <ListItemText primary={room.name} />
+    </ListItemButton>
+  ))}
+          </List>
+        </Box>
+      </Drawer>
+
+      <AppBar position="fixed" sx={{ zIndex: 1050 }}>
+        <Toolbar sx={{ display: "flex", justifyContent: "center" }}>
+          <Typography variant="h6" noWrap>
+            Design Rooms
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          marginLeft: `${drawerWidth}px`,
+          marginTop: "64px",
+        }}
+      >
+        {children}
+      </Box>
+
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Add a New Room</DialogTitle>
+        <DialogContent>
+  <TextField
+    autoFocus
+    margin="dense"
+    id="roomName"
+    label="Room Name"
+    type="text"
+    fullWidth
+    value={roomName}
+    onChange={(e) => {
+      setRoomName(e.target.value);
+      setError(""); // Clear error message on input change
+    }}
+    variant="outlined"
+    error={!!error} // Highlight the text field if there's an error
+    helperText={error} // Show the error message below the text field
+  />
+</DialogContent>
+
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSaveRoom} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+};
+
+export default Layout;
