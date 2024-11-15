@@ -1,46 +1,31 @@
-# Getting Started with Create React App
+# Assignment README
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
+This is a 3-day assignment completed for ecologital. Due to time constraints, the assignment was built using TypeScript and a simple local file-based database (`data.json`) instead of a connection to MongoDB. Although MongoDB integration was planned, it was not implemented due to time limitations.
 
-## Available Scripts
+## Prerequisites
+Before running the application, make sure you have the following installed:
+- Node.js 
+- npm (Node Package Manager)
 
-In the project directory, you can run:
+## Steps to Run the Application
 
-### `npm start`
+1. **Install Dependencies**  
+   Open your terminal in the project directory and run the following command to install all required dependencies:
+   ```bash
+   npm install
+   node server.js
+   npm start
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Key Points Covered:
+1. **Installation and Running**: Instructions for `npm install`, running the server (`server.js`), and starting the frontend (`npm start`).
+2. **Limitations**: Acknowledgment that MongoDB wasn't connected and Redux wasn't used due to the nature of the application.
+3. **Backend Services**: Explanation of the decision to keep everything in one file (`server.js`).
+4. **Data Handling**: The use of `data.json` as the database instead of MongoDB.
+5. **Working Video**: A placeholder for the video demonstration link.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+[Working Video](https://drive.google.com/file/d/1qk7MyeFa_i7muDcRlx1YCdXWyhyBbwK5/view?usp=sharing)
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
