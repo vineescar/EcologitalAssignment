@@ -63,13 +63,18 @@ The following libraries and dependencies were used in this project:
    ```bash
    npm install
 
+### Can improve:
+1. **We can provide height and width of the table by ading its property in table array.
+2. **Can improve folder structure but i did not arrange beacase of the code readability.
+3. ** we can animate it using threejs.
+
    
 ### Key Points Covered:
 1. **Installation and Running**: Instructions for `npm install`, running the server (`server.js`), and starting the frontend (`npm start`).
 2. **Limitations**: Acknowledgment that MongoDB wasn't connected and Redux wasn't used due to the nature of the application.
 3. **Backend Services**: Explanation of the decision to keep everything in one file (`server.js`).
 4. **Data Handling**: The use of `data.json` as the database instead of MongoDB.
-5. **Working Video**: A placeholder for the video demonstration link.
+6. **Working Video**: A placeholder for the video demonstration link.
 
 [Working Video](https://drive.google.com/file/d/1qk7MyeFa_i7muDcRlx1YCdXWyhyBbwK5/view?usp=sharing)
 
