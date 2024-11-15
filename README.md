@@ -63,6 +63,7 @@ The following libraries and dependencies were used in this project:
    ```bash
    npm install
 
+   
 ### Key Points Covered:
 1. **Installation and Running**: Instructions for `npm install`, running the server (`server.js`), and starting the frontend (`npm start`).
 2. **Limitations**: Acknowledgment that MongoDB wasn't connected and Redux wasn't used due to the nature of the application.
