@@ -1,7 +1,7 @@
 # Assignment README
 
 ## Overview
-This is a 3-day assignment completed for [Company Name]. Due to time constraints, the assignment was built using TypeScript and a simple local file-based database (`data.json`) instead of a connection to MongoDB. Although MongoDB integration was planned, it was not implemented due to time limitations.
+This is a 3-day assignment completed for Ecologital. Due to time constraints, the assignment was built using TypeScript and a simple local file-based database (`data.json`) instead of a connection to MongoDB. Although MongoDB integration was planned, it was not implemented due to time limitations.
 
 ## Prerequisites
 Before running the application, make sure you have the following installed:
