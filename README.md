@@ -1,12 +1,60 @@
 # Assignment README
 
 ## Overview
-This is a 3-day assignment completed for ecologital. Due to time constraints, the assignment was built using TypeScript and a simple local file-based database (`data.json`) instead of a connection to MongoDB. Although MongoDB integration was planned, it was not implemented due to time limitations.
+This is a 3-day assignment completed for [Company Name]. Due to time constraints, the assignment was built using TypeScript and a simple local file-based database (`data.json`) instead of a connection to MongoDB. Although MongoDB integration was planned, it was not implemented due to time limitations.
 
 ## Prerequisites
 Before running the application, make sure you have the following installed:
-- Node.js 
+- Node.js (version >=14.x)
 - npm (Node Package Manager)
+
+## Libraries and Dependencies Used
+The following libraries and dependencies were used in this project:
+
+### Frontend
+- **React** (`^18.3.1`)  
+  A JavaScript library for building user interfaces.
+  
+- **React Router DOM** (`^6.28.0`)  
+  A library for adding routing capabilities to React applications.
+
+- **Material-UI** (`^6.1.6`)  
+  A popular React UI framework for building modern, responsive designs.
+  
+- **@mui/icons-material** (`^6.1.6`)  
+  Material UI icons for React.
+  
+- **Axios** (`^1.7.7`)  
+  A promise-based HTTP client for making requests to the backend.
+
+- **@emotion/react** (`^11.13.3`)  
+  A library for writing CSS styles with JavaScript.
+
+- **@emotion/styled** (`^11.13.0`)  
+  A CSS-in-JS library used with React to style components.
+
+### Development
+- **TypeScript** (`^4.9.5`)  
+  A superset of JavaScript that provides static typing.
+
+- **Jest** (`^27.5.1`)  
+  A JavaScript testing framework for running tests on the application.
+
+- **@testing-library/react** (`^16.0.1`)  
+  A testing utility for React that helps in testing components.
+
+- **@testing-library/jest-dom** (`^6.6.3`)  
+  Custom matchers for Jest that help in testing the DOM.
+
+- **React Scripts** (`5.0.1`)  
+  A set of scripts for creating React apps using Create React App.
+
+### Backend (for local development)
+- **Express** (`^4.21.1`)  
+  A web framework for Node.js used to build the server.
+
+- **CORS** (`^2.8.5`)  
+  A package to enable Cross-Origin Resource Sharing for the server.
 
 ## Steps to Run the Application
 
@@ -14,8 +62,6 @@ Before running the application, make sure you have the following installed:
    Open your terminal in the project directory and run the following command to install all required dependencies:
    ```bash
    npm install
-   node server.js
-   npm start
 
 ### Key Points Covered:
 1. **Installation and Running**: Instructions for `npm install`, running the server (`server.js`), and starting the frontend (`npm start`).
