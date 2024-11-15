@@ -1,9 +1,8 @@
-// App.tsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Layout from "./Layout"; // Import the layout
-import RoomPage from "./components/RoomPage"; // Import RoomPage component
-import MainComponent from "./components/MainComponent"; // Import MainComponent
+import Layout from "./Layout"; 
+import RoomPage from "./components/RoomPage"; 
+import MainComponent from "./components/MainComponent"; 
 
 const App: React.FC = () => {
   return (

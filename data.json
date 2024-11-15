@@ -1,23 +1,28 @@
 [
   {
-    "id": "1731617375578",
-    "name": "room1",
+    "id": "1731640430629",
+    "name": "Room1",
     "tables": [
       {
-        "src": "/static/media/Mid.ba26aff8de68b44f3a71a0f146a3764f.svg",
-        "x": 110,
-        "y": 121.125,
-        "name": "table 1",
+        "src": "/static/media/Table.555c2e3ec929a7a25a000611ef8a182b.svg",
+        "x": 224,
+        "y": 160.125,
+        "name": "Table1",
         "min": 2,
-        "max": 4,
-        "online": false,
+        "max": 5,
+        "online": true,
+        "rotation": 180
+      },
+      {
+        "src": "/static/media/Mid.ba26aff8de68b44f3a71a0f146a3764f.svg",
+        "x": 571,
+        "y": 210.125,
+        "name": "Table2",
+        "min": 1,
+        "max": 2,
+        "online": true,
         "rotation": 90
       }
     ]
-  },
-  {
-    "id": "1731618213803",
-    "name": "room2",
-    "tables": []
   }
 ]

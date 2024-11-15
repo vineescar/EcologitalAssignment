@@ -75,7 +75,7 @@ const RoomPage: React.FC = () => {
       .catch((error) => {
         console.error('Error fetching layout data:', error);
       });
-  }, []); 
+  }, [roomName]); 
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -291,7 +291,7 @@ const RoomPage: React.FC = () => {
             marginTop: '64px', 
           }}
         >
-          <Typography variant="h6" sx={{ mt: 2, color: '#BB2D26' }}>Drag the Image</Typography>
+          <Typography variant="h6" sx={{ mt: 2, color: '#BB2D26' }}>Drag the Table</Typography>
           <img
             src={image}
             alt="draggable"
@@ -391,7 +391,7 @@ const RoomPage: React.FC = () => {
           onClick={() => handleDeleteRoom(defaultRoomName)}
           startIcon={<DeleteIcon />}
         >
-          Delete Table
+          Delete Room
         </Button>
       </h1>
 

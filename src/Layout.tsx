@@ -115,7 +115,7 @@ const handleRoomClick = (roomName: string) => {
 
       <AppBar position="fixed" sx={{ zIndex: 1050 ,backgroundColor: '#F3DFDE',color:'black'}} >
         <Toolbar sx={{ display: "flex", justifyContent: "center" }}>
-          <Typography variant="h4" noWrap>
+          <Typography variant="h4" noWrap sx={{marginLeft:'100px'}}>
             Floor Management
           </Typography>
         </Toolbar>
